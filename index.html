@@ -61,7 +61,7 @@
 </head>
 <body>
   <div class="form-container">
-    <h2>Project Mentor Selection</h2>
+    <h2>CSE(AIML): Project Mentor Selection (Batch 2023-2027)</h2>
     <p style="text-align: center;">Select your group and preferred faculty mentor. Each mentor can guide up to 2 groups. Choices are updated in real-time.</p>
     <form id="mentorForm" action="https://formspree.io/f/mwpbywnz" method="POST">
       <input type="hidden" name="group" id="groupHidden">
@@ -110,7 +110,7 @@
     // Update dropdown with available faculty
     function updateDropdown() {
       const dropdown = document.getElementById('facultySelect');
-      dropdown.innerHTML = '<option value="" disabled selected>Select a faculty mentor</option>';
+      dropdown.innerHTML = '<option value="" disabled selected>Select a Project mentor</option>';
       let hasOptions = false;
       for (const [fac, info] of Object.entries(facultyLimits)) {
         if (info.count < 2) {
