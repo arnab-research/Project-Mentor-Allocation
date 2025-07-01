@@ -99,11 +99,11 @@
   <script>
     // Initialize faculty limits (Prof. Atin Mukherjee has 2 groups)
     const facultyLimits = {
-      "Prof. (Dr.) Gour Sundar Mitra Thakur": { count: 0, focus: "AI" },
-      "Prof. Biswajit Saha": { count: 0, focus: "Robotics" },
-      "Prof. (Dr.) Arnab Banerjee": { count: 0, focus: "Data Science" },
-      "Prof. Atin Mukherjee": { count: 2, focus: "Machine Learning" },
-      "Prof. Suman Dasgupta": { count: 0, focus: "Cybersecurity" }
+      "Prof. (Dr.) Gour Sundar Mitra Thakur": { count: 0, focus: "Generative AI, Cyber Security, AI in Microwave Technology" },
+      "Prof. Biswajit Saha": { count: 0, focus: "AI for Lifestyle Diseases, AI for Biology " },
+      "Prof. (Dr.) Arnab Banerjee": { count: 0, focus: "Computer Vision, AI in Assistive System Design, AI in Smart Aquaculture, Medical Image Analysis" },
+      "Prof. Atin Mukherjee": { count: 0, focus: "Embedded AI, IOT" },
+      "Prof. Suman Dasgupta": { count: 0, focus: "AI in Biomedical Signal Processing, AI in Smart Healthcare Management" }
     };
     const submissions = JSON.parse(localStorage.getItem('submissions')) || [];
 
@@ -151,7 +151,7 @@
       facultyLimits[faculty].count++;
       submissions.push({ group, leaderName, email, faculty, timestamp });
       localStorage.setItem('submissions', JSON.stringify(submissions));
-      document.getElementById('message').innerText = `Submission successful for ${group}! Please wait for confirmation.`;
+      document.getElementById('message').innerText = `Submission successful for ${group}!.`;
 
       // Set hidden input for Formspree
       document.getElementById('groupHidden').value = group;
