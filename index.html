@@ -137,7 +137,11 @@
       const email = document.getElementById('email').value;
       const faculty = document.getElementById('facultySelect').value;
       const timestamp = new Date().toISOString();
-
+      // Check for duplicate group submission
+      if (submissions.some(sub => sub.group === group)) {
+        document.getElementById('message').innerText = `Error: ${group} has already submitted. Contact the department if you need to update your selection.`;
+        return;
+      }
       if (!faculty) {
         document.getElementById('message').innerText = 'No faculty available. Please contact the department.';
         return;
