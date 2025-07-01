@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Faculty Allocation</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+      background: #f4f4f4;
+    }
+    .form-container {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      width: 100%;
+      max-width: 500px;
+    }
+    h2 {
+      text-align: center;
+      color: #333;
+    }
+    label {
+      display: block;
+      margin: 10px 0 5px;
+      font-weight: bold;
+    }
+    input, select {
+      width: 100%;
+      padding: 8px;
+      margin-bottom: 15px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      box-sizing: border-box;
+    }
+    button {
+      width: 100%;
+      padding: 10px;
+      background: #007bff;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+    button:hover {
+      background: #0056b3;
+    }
+    #message {
+      text-align: center;
+      margin-top: 10px;
+      color: red;
+    }
+  </style>
+</head>
+<body>
+  <div class="form-container">
+    <h2>Project Mentor Selection</h2>
+    <p style="text-align: center;">Select your group and preferred faculty mentor. Each mentor can guide up to 2 groups. Choices are updated in real-time.</p>
+    <form id="mentorForm" action="https://formspree.io/f/mwpbywnz" method="POST">
+      <input type="hidden" name="group" id="groupHidden">
+      <label for="groupSelect">Group:</label>
+      <select id="groupSelect" required>
+        <option value="" disabled selected>Select your group</option>
+        <option value="GR1">GR1</option>
+        <option value="GR2">GR2</option>
+        <option value="GR3">GR3</option>
+        <option value="GR4">GR4</option>
+        <option value="GR5">GR5</option>
+        <option value="GR6">GR6</option>
+        <option value="GR7">GR7</option>
+        <option value="GR8">GR8</option>
+        <option value="GR9">GR9</option>
+        <option value="GR10">GR10</option>
+      </select>
+
+      <label for="leaderName">Group Leader Name:</label>
+      <input type="text" name="leaderName" id="leaderName" required placeholder="Enter group leader's full name">
+
+      <label for="email">Email Address:</label>
+      <input type="email" name="email" id="email" required placeholder="Enter group leader's email">
+
+      <label for="facultySelect">Faculty Selection:</label>
+      <select name="faculty" id="facultySelect" required>
+        <!-- Populated by JavaScript -->
+      </select>
+
+      <button type="submit">Submit</button>
+    </form>
+    <div id="message"></div>
+  </div>
+
+  <script>
+    // Initialize faculty limits (Prof. Atin Mukherjee has 2 groups)
+    const facultyLimits = {
+      "Prof. (Dr.) Gour Sundar Mitra Thakur": { count: 0, focus: "AI" },
+      "Prof. Biswajit Saha": { count: 0, focus: "Robotics" },
+      "Prof. (Dr.) Arnab Banerjee": { count: 0, focus: "Data Science" },
+      "Prof. Atin Mukherjee": { count: 2, focus: "Machine Learning" },
+      "Prof. Suman Dasgupta": { count: 0, focus: "Cybersecurity" }
+    };
+    const submissions = JSON.parse(localStorage.getItem('submissions')) || [];
+
+    // Update dropdown with available faculty
+    function updateDropdown() {
+      const dropdown = document.getElementById('facultySelect');
+      dropdown.innerHTML = '<option value="" disabled selected>Select a faculty mentor</option>';
+      let hasOptions = false;
+      for (const [fac, info] of Object.entries(facultyLimits)) {
+        if (info.count < 2) {
+          const option = document.createElement('option');
+          option.value = fac;
+          option.text = `${fac} (${info.focus})`;
+          dropdown.appendChild(option);
+          hasOptions = true;
+        }
+      }
+      if (!hasOptions) {
+        dropdown.innerHTML = '<option value="">No Faculty Available</option>';
+        dropdown.disabled = true;
+        document.querySelector('button').disabled = true;
+      }
+    }
+    updateDropdown(); // Initial call
+
+    // Handle form submission
+    document.getElementById('mentorForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const group = document.getElementById('groupSelect').value;
+      const leaderName = document.getElementById('leaderName').value;
+      const email = document.getElementById('email').value;
+      const faculty = document.getElementById('facultySelect').value;
+      const timestamp = new Date().toISOString();
+
+      if (!faculty) {
+        document.getElementById('message').innerText = 'No faculty available. Please contact the department.';
+        return;
+      }
+
+      if (facultyLimits[faculty].count >= 2) {
+        document.getElementById('message').innerText = `${faculty} is already assigned to 2 groups. Please select another faculty.`;
+        return;
+      }
+
+      facultyLimits[faculty].count++;
+      submissions.push({ group, leaderName, email, faculty, timestamp });
+      localStorage.setItem('submissions', JSON.stringify(submissions));
+      document.getElementById('message').innerText = `Submission successful for ${group}! Please wait for confirmation.`;
+
+      // Set hidden input for Formspree
+      document.getElementById('groupHidden').value = group;
+
+      // Submit to Formspree
+      fetch('https://formspree.io/f/mwpbywnz', {
+        method: 'POST',
+        body: new FormData(document.getElementById('mentorForm')),
+        headers: { 'Accept': 'application/json' }
+      })
+      .then(response => {
+        if (response.ok) {
+          document.getElementById('mentorForm').reset();
+          updateDropdown();
+          console.log('Submissions:', submissions);
+        } else {
+          document.getElementById('message').innerText = 'Error submitting form. Please try again or contact the department.';
+        }
+      })
+      .catch(error => {
+        document.getElementById('message').innerText = 'Error: ' + error.message;
+        console.error('Formspree error:', error);
+      });
+    });
+  </script>
+</body>
+</html>
